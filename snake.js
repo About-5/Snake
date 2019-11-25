@@ -1,20 +1,22 @@
 let canvas = document.querySelector("canvas");
 let ctx = canvas.getContext("2d");
 
-canvas.width = 800;
-canvas.height = 800;
-
 document.addEventListener("keydown", keyPress); 
 
 let fps = 1000/15;
 let tileSize = 20;
 let gridSize = 40;
+
+canvas.width = tileSize * gridSize;
+canvas.height = tileSize * gridSize;
+
 let apple = {
     x: Math.floor(Math.random() * gridSize),
     y: Math.floor(Math.random() * gridSize)
 };
+
 let velocity = {
-    x: 0,
+    x: 1,
     y: 0
 };
 
@@ -40,8 +42,8 @@ function keyPress(e) {
 }
 
 function Snake() {
-    this.x = 10;
-    this.y = 10;
+    this.x = Math.floor(gridSize / 2);
+    this.y = Math.floor(gridSize / 2);
     this.body = [];
     this.length = 4;
     for(let i = 0; i < this.length; i++) {
@@ -52,6 +54,16 @@ function Snake() {
 Snake.prototype.update = function() {
     this.x += velocity.x;
     this.y += velocity.y;
+
+    if(this.x < 0 || this.x > gridSize || this.y < 0 || this.y > gridSize) {
+        location.reload();
+    }
+
+    for(let i = 0; i < this.length; i++) {
+        if(this.x == this.body[i].x && this.y == this.body[i].y) {
+            location.reload();
+        }
+    }
     
     if(this.x == apple.x && this.y == apple.y) {
         this.length++;
@@ -60,13 +72,8 @@ Snake.prototype.update = function() {
         apple.y = Math.floor(Math.random() * gridSize);
     }
 
-    if(this.x < 0 || this.x > gridSize || this.y < 0 || this.y > gridSize) {
-        alert("GAME OVER");
-        location.reload();
-    }
-
     this.body.push({x: this.x, y: this.y})
-    if(this.body.length > length) {
+    while(this.body.length > this.length) {
         this.body.shift();
     }
 
